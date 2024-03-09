@@ -3,18 +3,18 @@
 module mips(
 	input clk,
 	input reset,
-	input [31:0] i_inst_rdata,//i_inst_addr��Ӧ�� 32 λָ��
-	input [31:0] m_data_rdata,//DM�洢����Ӧ����
+	input [31:0] i_inst_rdata,
+	input [31:0] m_data_rdata,
 	
-	output [31:0] i_inst_addr,//��ȡָ��F ��PC
-	output [31:0] m_data_addr,//��д��/���������ݴ洢����Ӧ��ַ
-	output [31:0] m_data_wdata,//��д�����ݴ洢����Ӧ����
-	output [3:0] m_data_byteen,//��λ�ֽ�ʹ��
-	output [31:0] m_inst_addr, // M ��PC
-	output w_grf_we, //GRF дʹ���ź�
-   output [4:0] w_grf_addr, //GRF �д�д��Ĵ������
-   output [31:0] w_grf_wdata, //GRF �д�д������
-   output [31:0] w_inst_addr // W �� PC
+	output [31:0] i_inst_addr,
+	output [31:0] m_data_addr,
+	output [31:0] m_data_wdata,
+	output [3:0] m_data_byteen,
+	output [31:0] m_inst_addr, 
+	output w_grf_we,
+   output [4:0] w_grf_addr,
+   output [31:0] w_grf_wdata,
+   output [31:0] w_inst_addr
     );
 	wire [31:0] M_DMout0;
 	wire[31:0] instr_F;
@@ -50,7 +50,7 @@ module mips(
 	wire [4:0] E_RFdst, M_RFdst, W_RFdst;
 	wire [2:0] E_RFWDsel, M_RFWDsel, W_RFWDsel;
 	
-	//RFWDsel :����������ݴ���RF,�ɵ�ǰָ�����
+	//RFWDsel :
 	assign E_RFwd = (E_RFWDsel == `RF_jlink)  ? pc_E + 8 :
 															32'bz;
 												  
@@ -142,7 +142,7 @@ DREG _DREG (
 	D_GRF _Dgrf(
 		.clk(clk), 
 		.reset(reset), 
-		.WE(1'b1), //��д=д0
+		.WE(1'b1),
 		.A1(D_rs_addr), 
 		.A2(D_rt_addr), 
 		.A3(W_RFdst), 
@@ -267,7 +267,7 @@ wire [31:0] M_DMout;
 M_DEload _Mdeload (
     .addr(M_ALUout), 
     .DEop(M_DEop), 
-    .DMout0(M_DMout0),//�ⲿ����
+    .DMout0(M_DMout0),
     .DMout(M_DMout)//out
     );	 
 	 
