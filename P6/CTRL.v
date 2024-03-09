@@ -20,7 +20,6 @@ module CTRL(
 	output [2:0] RFWDsel,
 	output [4:0] A3addr,
 	output branch,
-	//output [1:0] lors,
 	output [2:0] CMPop,
 	output [3:0] MDUop,
 	output [2:0] BEop, //store
@@ -36,14 +35,14 @@ module CTRL(
 	wire [5:0] opcode = {instr[31:26]};
 	wire [5:0] func = {instr[5:0]};
 	
-	assign rs = {instr[25:21]};//splitter 前六个输出
+	assign rs = {instr[25:21]};
 	assign rt = {instr[20:16]};
 	assign rd = {instr[15:11]};
 	assign shamt = {instr[10:6]};
 	assign imm16 = {instr[15:0]};
 	assign imm26 = {instr[25:0]};
 	
-	//指令集
+	
 	assign special = (opcode == 0);
 	
 	assign add = (special && func == 6'b100_000);
@@ -55,7 +54,7 @@ module CTRL(
 	assign beq = (opcode == 6'b000_100);
 	assign bne = (opcode == 6'b000101);
 	
-	assign bltzal = (opcode == 6'b000001);//////
+	assign bltzal = (opcode == 6'b000001);
 	assign bgezalr = (opcode == 6'b111110);
 	assign lui = (opcode == 6'b001_111);
 	assign addi = (opcode == 6'b001_000);
@@ -82,7 +81,7 @@ module CTRL(
 	assign msub = (opcode == 6'b011100 && func == 6'b000100);
 	assign jal = (opcode == 6'b000_011);
 	assign jr = (special && func == 6'b000100);
-	//分类
+	
 	assign cal_r = (add|sub|AND|OR|slt|sltu);
 	assign cal_i = (lui|addi|andi|ori);
 	assign store = (sw|sh|sb);
@@ -90,14 +89,13 @@ module CTRL(
 	assign Half = (sh | lh);
 	assign Byte = (sb | lb);
 	assign Word = (sw | lw);
-	assign j_reg = (jr);//无条件跳转至$rs
-	assign j_imm = (jal);//无条件跳转至imm26
-	assign j_link = (jal);//link 写$31
+	assign j_reg = (jr);
+	assign j_imm = (jal);
+	assign j_link = (jal);
 	assign md = (mult|multu|div|divu|msub);
 	assign mf = (mfhi | mflo);
 	assign mt = (mthi | mtlo);
 	
-	//输出信号
 	assign ALUop = (lui) ? `ALU_lui : 
 						(sub)? `ALU_sub :
 						(AND|andi)? `ALU_and :
@@ -130,11 +128,11 @@ module CTRL(
 	assign A3addr = (cal_r | mf | bgezalr) ? rd:
 						 (cal_i | load ) ? rt :
 						 (j_link | (bltzal && b_jump) ) ? 5'd31:
-	  					 0;//相当于不写
+	  					 0;
 						
 	assign branch = (beq | bne | bltzal);
 	
-	assign CMPop = (beq) ? `CMP_beq://必须具体到b级每一条指令
+	assign CMPop = (beq) ? `CMP_beq:
 						(bne) ? `CMP_bne:
 						(bltzal) ? `CMP_bltzal:
 						(bgezalr) ? `CMP_bgezalr:
@@ -162,15 +160,14 @@ module CTRL(
                   0;
 	assign MDUstart = md;
 	
-	//转发和暂停
-	assign rs_Tuse = (cal_r | cal_i | load | store | mt | md ) ? 3'd1://///////////////////////
+	assign rs_Tuse = (cal_r | cal_i | load | store | mt | md ) ? 3'd1:
 							(branch | j_reg )? 3'd0://pc<= rs
-							3'd3;//无限大 
+							3'd3;
 							
 	assign rt_Tuse = (cal_r | md) ? 3'd1:
 							(store) ? 3'd2:
 							(branch) ? 3'd0:
-							//(beq|bne) ? 3'd0: bltzal的rtuse=3
+							//(beq|bne) ? 3'd0: bltzal  rtuse=3
 							3'd3;
 							
 	assign E_Tnew = (cal_r |  cal_i | mf ) ? 3'd1:
